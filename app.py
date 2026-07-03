@@ -7,6 +7,7 @@ from customer_service import (
 from sales_report_service import (
     register_report, list_reports, get_report, update_report
 )
+from approval_service import transition_status
 
 
 CUSTOMER_FILE = os.path.join('data', 'customers.json')
@@ -98,6 +99,10 @@ def report_menu():
         print('   1. 등록')
         print('   2. 목록')
         print('   3. 수정')
+        print('   4. 제출')
+        print('   5. 승인')
+        print('   6. 반려')
+        print('   7. 철회')
         print('   0. 뒤로 가기')
         choice = input('   선택: ').strip()
 
@@ -132,6 +137,46 @@ def report_menu():
             result = update_report(rid, cid, date, content)
             if result['success']:
                 print(f'   수정 완료: {rid}')
+            else:
+                for err in result['errors']:
+                    print(f'   오류: {err}')
+
+        elif choice == '4':
+            print_header('영업일지 제출')
+            rid = input('   영업일지 ID: ').strip()
+            result = transition_status(rid, 'SUBMITTED')
+            if result['success']:
+                print(f'   제출 완료: {rid} → {result["report"]["status"]}')
+            else:
+                for err in result['errors']:
+                    print(f'   오류: {err}')
+
+        elif choice == '5':
+            print_header('영업일지 승인')
+            rid = input('   영업일지 ID: ').strip()
+            result = transition_status(rid, 'APPROVED')
+            if result['success']:
+                print(f'   승인 완료: {rid} → {result["report"]["status"]}')
+            else:
+                for err in result['errors']:
+                    print(f'   오류: {err}')
+
+        elif choice == '6':
+            print_header('영업일지 반려')
+            rid = input('   영업일지 ID: ').strip()
+            result = transition_status(rid, 'REJECTED')
+            if result['success']:
+                print(f'   반려 완료: {rid} → {result["report"]["status"]}')
+            else:
+                for err in result['errors']:
+                    print(f'   오류: {err}')
+
+        elif choice == '7':
+            print_header('영업일지 철회')
+            rid = input('   영업일지 ID: ').strip()
+            result = transition_status(rid, 'DRAFT')
+            if result['success']:
+                print(f'   철회 완료: {rid} → {result["report"]["status"]}')
             else:
                 for err in result['errors']:
                     print(f'   오류: {err}')
