@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "customer_id": "C001",
+    "customer_name": "보고서테스트",
+    "manager_name": "이영수",
+    "email": "lee@test.com"
+  },
+  {
+    "customer_id": "C002",
+    "customer_name": "결재테스트",
+    "manager_name": "최민수",
+    "email": "choi@test.com"
+  }
+]

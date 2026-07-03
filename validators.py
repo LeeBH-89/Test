@@ -10,8 +10,8 @@ def validate_customer_input(name, manager, email):
         errors.append('담당자명은 필수 입력입니다.')
     if not email or not email.strip():
         errors.append('이메일은 필수 입력입니다.')
-    elif '@' not in email.strip():
-        errors.append('이메일 형식이 올바르지 않습니다. (@가 포함되어야 합니다)')
+    elif not re.match(r'^[\w.+-]+@[\w-]+\.[\w.]+$', email.strip()):
+        errors.append('이메일 형식이 올바르지 않습니다.')
     return errors
 
 
