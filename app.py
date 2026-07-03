@@ -4,6 +4,9 @@ from customer_service import (
     register_customer, list_customers, get_customer,
     update_customer, delete_customer
 )
+from sales_report_service import (
+    register_report, list_reports, get_report, update_report
+)
 
 
 CUSTOMER_FILE = os.path.join('data', 'customers.json')
@@ -89,6 +92,56 @@ def customer_menu():
             print('   잘못된 선택입니다.')
 
 
+def report_menu():
+    while True:
+        print_header('영업일지 관리')
+        print('   1. 등록')
+        print('   2. 목록')
+        print('   3. 수정')
+        print('   0. 뒤로 가기')
+        choice = input('   선택: ').strip()
+
+        if choice == '1':
+            print_header('영업일지 등록')
+            cid = input('   고객사 ID: ').strip()
+            date = input('   활동일자 (YYYY-MM-DD): ').strip()
+            content = input('   활동내용: ').strip()
+            result = register_report(cid, date, content)
+            if result['success']:
+                r = result['report']
+                print(f'   등록 완료: {r["report_id"]} - {r["status"]}')
+            else:
+                for err in result['errors']:
+                    print(f'   오류: {err}')
+
+        elif choice == '2':
+            print_header('영업일지 목록')
+            reports = list_reports()
+            if not reports:
+                print('   등록된 영업일지가 없습니다.')
+            else:
+                for r in reports:
+                    print(f'   {r["report_id"]} | {r["customer_id"]} | {r["activity_date"]} | {r["status"]}')
+
+        elif choice == '3':
+            print_header('영업일지 수정')
+            rid = input('   영업일지 ID: ').strip()
+            cid = input('   새 고객사 ID: ').strip()
+            date = input('   새 활동일자 (YYYY-MM-DD): ').strip()
+            content = input('   새 활동내용: ').strip()
+            result = update_report(rid, cid, date, content)
+            if result['success']:
+                print(f'   수정 완료: {rid}')
+            else:
+                for err in result['errors']:
+                    print(f'   오류: {err}')
+
+        elif choice == '0':
+            break
+        else:
+            print('   잘못된 선택입니다.')
+
+
 def main_menu():
     while True:
         print_header('Smart Sales CLI')
@@ -100,8 +153,7 @@ def main_menu():
         if choice == '1':
             customer_menu()
         elif choice == '2':
-            print_header('영업일지 관리')
-            print('   (기능 미구현)')
+            report_menu()
         elif choice == '0':
             print('   프로그램을 종료합니다.')
             break
