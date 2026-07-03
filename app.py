@@ -2,7 +2,7 @@ import os
 from storage import load_json, save_json
 from customer_service import (
     register_customer, list_customers, get_customer,
-    update_customer, delete_customer
+    update_customer, delete_customer, search_customers
 )
 
 
@@ -23,6 +23,7 @@ def customer_menu():
         print('   3. 상세 조회')
         print('   4. 수정')
         print('   5. 삭제')
+        print('   6. 검색')
         print('   0. 뒤로 가기')
         choice = input('   선택: ').strip()
 
@@ -82,6 +83,16 @@ def customer_menu():
             else:
                 for err in result['errors']:
                     print(f'   오류: {err}')
+
+        elif choice == '6':
+            print_header('고객사 검색')
+            keyword = input('   검색어: ').strip()
+            results = search_customers(keyword)
+            if not results:
+                print('   검색 결과가 없습니다.')
+            else:
+                for c in results:
+                    print(f'   {c["customer_id"]} | {c["customer_name"]} | {c["manager_name"]} | {c["email"]}')
 
         elif choice == '0':
             break

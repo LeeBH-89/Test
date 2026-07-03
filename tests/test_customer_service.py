@@ -3,7 +3,7 @@ import os
 import json
 from customer_service import (
     register_customer, list_customers, get_customer,
-    update_customer, delete_customer,
+    update_customer, delete_customer, search_customers,
     CUSTOMER_FILE
 )
 
@@ -150,6 +150,63 @@ class TestCustomerService(unittest.TestCase):
         result = delete_customer('C999')
         self.assertFalse(result['success'])
         self.assertIn('C999', result['errors'][0])
+
+    # ---- 검색 ----
+
+    def test_search_by_customer_name(self):
+        register_customer('알파고', '김철수', 'kim@test.com')
+        register_customer('베타사', '이영희', 'lee@test.com')
+        results = search_customers('알파')
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['customer_name'], '알파고')
+
+    def test_search_by_manager_name(self):
+        register_customer('알파고', '김철수', 'kim@test.com')
+        register_customer('베타사', '이영희', 'lee@test.com')
+        results = search_customers('이영')
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['manager_name'], '이영희')
+
+    def test_search_by_email(self):
+        register_customer('알파고', '김철수', 'kim@test.com')
+        register_customer('베타사', '이영희', 'lee@test.com')
+        results = search_customers('test.com')
+        self.assertEqual(len(results), 2)
+
+    def test_search_case_insensitive(self):
+        register_customer('AlphaCorp', 'Kim', 'Kim@Test.COM')
+        results = search_customers('alpha')
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['customer_name'], 'AlphaCorp')
+        # 담당자명 대소문자 검색
+        results = search_customers('kim')
+        self.assertEqual(len(results), 1)
+        # 이메일 대소문자 검색
+        results = search_customers('test.com')
+        self.assertEqual(len(results), 1)
+
+    def test_search_empty_string(self):
+        register_customer('알파고', '김철수', 'kim@test.com')
+        results = search_customers('')
+        self.assertEqual(len(results), 0)
+
+    def test_search_blank_string(self):
+        register_customer('알파고', '김철수', 'kim@test.com')
+        results = search_customers('   ')
+        self.assertEqual(len(results), 0)
+
+    def test_search_no_match(self):
+        register_customer('알파고', '김철수', 'kim@test.com')
+        results = search_customers('존재하지않는검색어')
+        self.assertEqual(len(results), 0)
+
+    def test_search_after_delete_other_records_unaffected(self):
+        register_customer('알파고', '김철수', 'kim@test.com')
+        register_customer('베타사', '이영희', 'lee@test.com')
+        results = search_customers('알파')
+        self.assertEqual(len(results), 1)
+        results = search_customers('베타')
+        self.assertEqual(len(results), 1)
 
 
 if __name__ == '__main__':
